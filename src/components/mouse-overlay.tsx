@@ -9,7 +9,11 @@ import { platform } from "@tauri-apps/plugin-os";
 const MIN_CLICK_DISPLAY_MS = 200;
 const isMacos = platform() === "macos";
 
-export const MouseOverlay = () => {
+interface MouseOverlayProps {
+    windowOffset?: { x: number; y: number };
+}
+
+export const MouseOverlay = ({ windowOffset = { x: 0, y: 0 } }: MouseOverlayProps) => {
     const wheel = useKeyEvent(state => state.mouse.wheel);
     const pressedMouseButton = useKeyEvent(state => state.pressedMouseButton);
     const style = useKeyStyle(state => state.mouse);
@@ -75,12 +79,14 @@ export const MouseOverlay = () => {
             if (!shouldUpdatePosition) return;
 
             const dpr = isMacos ? 1 : window.devicePixelRatio || 1;
+            const x = (state.mouse.x - windowOffset.x) / dpr;
+            const y = (state.mouse.y - windowOffset.y) / dpr;
             el.style.transform =
-                `translate3d(${state.mouse.x / dpr}px, ${state.mouse.y / dpr}px, 0) translate(-50%, -50%)`;
+                `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
         });
 
         return () => unsubscribe();
-    }, [style.showClicks, style.keepHighlight, style.showIndicator, style.keepIndicator]);
+    }, [style.showClicks, style.keepHighlight, style.showIndicator, style.keepIndicator, windowOffset]);
 
     // Logic to determine if we should render anything at all to keep DOM light
     const shouldRender = style.showClicks || style.keepHighlight || style.showIndicator || style.keepIndicator;

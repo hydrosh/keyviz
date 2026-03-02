@@ -38,7 +38,7 @@ export const AppearanceSettings = () => {
         <h2 className="text-sm text-muted-foreground font-medium">Position</h2>
         {
             monitors.length > 1 &&
-            <Item variant="muted">
+        <Item variant="muted">
                 <ItemContent>
                     <ItemTitle>
                         <HugeiconsIcon icon={ComputerIcon} size="1em" />
@@ -52,13 +52,15 @@ export const AppearanceSettings = () => {
                     <Select
                         value={appearance.monitor ?? ""}
                         onValueChange={(value) => {
-                            getAllWindows().then(windows => {
-                                const window = windows.find(w => w.label === "main");
-                                const monitor = monitors.find(m => m.name === value);
-                                if (monitor && window) {
-                                    window.setPosition(monitor.position);
-                                }
-                            });
+                            if (value !== "all") {
+                                getAllWindows().then(windows => {
+                                    const window = windows.find(w => w.label === "main");
+                                    const monitor = monitors.find(m => m.name === value);
+                                    if (monitor && window) {
+                                        window.setPosition(monitor.position);
+                                    }
+                                });
+                            }
                             setAppearance({ monitor: value });
                         }}
                     >
@@ -67,6 +69,7 @@ export const AppearanceSettings = () => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
+                                <SelectItem value="all">All Monitors</SelectItem>
                                 {
                                     monitors.map((monitor, index) => (
                                         <SelectItem key={monitor.name} value={monitor.name ?? index.toString()}>
